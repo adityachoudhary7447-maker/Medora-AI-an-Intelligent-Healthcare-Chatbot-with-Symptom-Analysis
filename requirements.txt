@@ -1,0 +1,50 @@
+# Core dependencies - REQUIRED
+streamlit
+pandas
+numpy>=1.26.0,<2.3.0
+
+# LangChain framework - REQUIRED
+langchain>=0.3.0,<0.4.0
+langchain-community>=0.3.0,<0.4.0
+langchain-ollama>=0.2.0,<0.4.0
+langchain-huggingface>=0.3.0,<0.4.0
+
+# Vector store and embeddings - REQUIRED
+faiss-cpu
+sentence-transformers
+
+# Image processing - REQUIRED
+Pillow
+
+# Optional dependencies for extended functionality
+# Uncomment as needed:
+
+# For additional image formats
+# pillow-heif
+
+# For advanced image processing
+# opencv-python-headless
+
+# For text processing (not currently used)
+# nltk
+
+# For model management (automatically installed with sentence-transformers)
+# huggingface-hub
+# transformers>=4.41.0
+
+# For token counting (not currently used in code)
+# tiktoken
+
+# For environment management (only needed in development)
+# python-dotenv
+
+# For testing (development only)
+pytest>=7.0.0
+pytest-html>=3.1.0
+pytest-cov>=4.0.0
+pytest-xdist>=3.0.0
+pytest-mock>=3.10.0
+pytest-timeout>=2.1.0
+robotframework>=6.0.0
+robotframework-requests>=0.9.0
+robotframework-seleniumlibrary>=6.0.0

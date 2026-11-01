@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  medical-assistant:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: medical-assistant-bot
+    ports:
+      - "8501:8501"
+    environment:
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2:1b}
+      - OLLAMA_VISION_MODEL=${OLLAMA_VISION_MODEL:-}
+      - OLLAMA_REQUEST_TIMEOUT=${OLLAMA_REQUEST_TIMEOUT:-120}
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+    volumes:
+      # Mount for development (uncomment for dev mode)
+      # - .:/app
+      # Mount logs directory
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Development service with hot reload
+  medical-assistant-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: medical-assistant-bot-dev
+    ports:
+      - "8502:8501"
+    environment:
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2:1b}
+      - OLLAMA_VISION_MODEL=${OLLAMA_VISION_MODEL:-}
+      - OLLAMA_REQUEST_TIMEOUT=${OLLAMA_REQUEST_TIMEOUT:-120}
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+      - STREAMLIT_SERVER_RUNONFITCOMPILERROR=true
+      - STREAMLIT_SERVER_FILE_WATCHER_TYPE=poll
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    profiles:
+      - dev
+    restart: unless-stopped
+    command: ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.fileWatcherType=poll"]
+
+  # SageMaker local testing service
+  sagemaker-local:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: sagemaker
+    container_name: medical-assistant-sagemaker
+    ports:
+      - "8080:8080"
+    environment:
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2:1b}
+      - OLLAMA_VISION_MODEL=${OLLAMA_VISION_MODEL:-}
+      - OLLAMA_REQUEST_TIMEOUT=${OLLAMA_REQUEST_TIMEOUT:-120}
+      - SAGEMAKER_PROGRAM=inference.py
+      - SAGEMAKER_SUBMIT_DIRECTORY=/opt/ml/code
+      - SAGEMAKER_CONTAINER_LOG_LEVEL=20
+      - SAGEMAKER_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+    volumes:
+      - ./logs:/opt/ml/output
+    profiles:
+      - sagemaker
+    restart: unless-stopped
+
+networks:
+  default:
+    name: medical-assistant-network

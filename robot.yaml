@@ -1,0 +1,60 @@
+# Robot Framework configuration for Medical Assistant Bot
+
+# Output directory
+outputdir: test-results/robot
+
+# Variable files
+variablefile:
+  - tests/robot_keywords/test_variables.py
+
+# Libraries
+library:
+  - Collections
+  - String
+  - OperatingSystem
+  - Process
+  - RequestsLibrary
+  - tests.robot_keywords.MedicalAssistantKeywords
+
+# Test execution
+test:
+  - tests/robot/medical_assistant.robot
+
+# Reporting
+report: test-results/robot/report.html
+log: test-results/robot/log.html
+output: test-results/robot/output.xml
+
+# Console output
+console: verbose
+consolecolors: on
+consolemarkers: on
+
+# Listener for custom reporting
+listener: tests.robot_keywords.TestListener
+
+# Include/exclude tags
+include: 
+  - smoke
+  - core
+
+# Exclude slow tests by default
+exclude:
+  - slow
+  - manual
+
+# Exit on failure
+exitonfailure: false
+
+# Random order
+randomize: none
+
+# Pre-run modifier
+prerunmodifier: tests.robot_keywords.TestSetupModifier
+
+# Extensions
+extension: robot_reports:HtmlReport
+
+# Resource files
+resource: 
+  - tests/robot/common_keywords.robot

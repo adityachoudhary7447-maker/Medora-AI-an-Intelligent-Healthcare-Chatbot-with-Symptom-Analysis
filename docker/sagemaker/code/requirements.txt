@@ -1,0 +1,6 @@
+# SageMaker inference requirements
+# Inherits from main requirements.txt but adds Flask for serving
+flask
+gunicorn
+boto3
+sagemaker
